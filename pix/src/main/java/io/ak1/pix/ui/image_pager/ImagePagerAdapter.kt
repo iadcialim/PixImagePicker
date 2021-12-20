@@ -16,7 +16,9 @@ import com.bumptech.glide.request.transition.Transition
 import com.github.chrisbanes.photoview.PhotoView
 import io.ak1.pix.R
 import java.util.*
-
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 
 internal class ImagePagerAdapter(private val context: Context, private val images: List<Uri>) : PagerAdapter() {
 
@@ -32,16 +34,17 @@ internal class ImagePagerAdapter(private val context: Context, private val image
     }
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        // inflating the item.xml
         val itemView: View = mLayoutInflater.inflate(R.layout.item_photo_viewer, container, false)
-
-        // referencing the image view from the item.xml file
         val previewImg: PhotoView = itemView.findViewById(R.id.previewImg) as PhotoView
-
+        val drawable = CircularProgressDrawable(context)
+        drawable.colorFilter = PorterDuffColorFilter(0xff3CE330.toInt(), PorterDuff.Mode.SRC_IN)
+        drawable.centerRadius = 100f
+        drawable.strokeWidth = 25f
+        drawable.start()
         // setting the image in the imageView
         Glide.with(context)
             .asBitmap().load(images[position])
-            .placeholder(R.drawable.ic_placeholder)
+            .placeholder(drawable)
             .error(R.drawable.ic_error)
             .into(object :
                 CustomTarget<Bitmap>() {

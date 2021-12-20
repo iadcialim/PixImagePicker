@@ -64,6 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|bottom"
             android:layout_marginBottom="5dp"
+            android:visibility="gone"
             android:text="@string/pix_bottom_message_with_video"
             android:textColor="#fff"
             android:textSize="12sp" />

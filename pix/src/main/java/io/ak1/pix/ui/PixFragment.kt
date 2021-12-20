@@ -30,6 +30,7 @@ import io.ak1.pix.models.Options
 import io.ak1.pix.models.PixViewModel
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
+import io.ak1.pix.utility.ARG_PREVIEW_PIX
 import io.ak1.pix.utility.CustomItemTouchListener
 import kotlinx.coroutines.*
 import java.lang.Runnable
@@ -41,7 +42,7 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 
 class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Unit)? = null) :
-    Fragment(), View.OnTouchListener {
+    PixBaseFragment(), View.OnTouchListener {
 
     private val model: PixViewModel by viewModels()
     private var _binding: FragmentPixBinding? = null
@@ -53,7 +54,10 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                     it.value
                 }) {
                 binding.permissionsLayout.permissionsLayout.hide()
-                binding.gridLayout.gridLayout.show()
+                if(options.showGallery)
+                    binding.gridLayout.gridLayout.show()
+                else
+                    binding.gridLayout.gridLayout.hide()
                 initialise(requireActivity())
             } else {
                 binding.gridLayout.gridLayout.hide()
@@ -67,6 +71,7 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
     private var mBottomSheetBehavior: BottomSheetBehavior<View>? = null
     private var scope = CoroutineScope(Dispatchers.IO)
     private var colorPrimaryDark = 0
+    private var showPreview: Boolean = false
 
     override fun onResume() {
         super.onResume()
@@ -92,11 +97,8 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         options = arguments?.getParcelable(ARG_PARAM_PIX) ?: Options()
-        requireActivity().let {
-            it.setupScreen()
-            it.actionBar?.hide()
-            colorPrimaryDark = it.color(R.color.primary_color_pix)
-        }
+        showPreview = arguments?.getBoolean(ARG_PREVIEW_PIX) ?: false
+        colorPrimaryDark = requireActivity().color(R.color.primary_color_pix)
     }
 
 
@@ -129,7 +131,6 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                 }
             }
             permReqLauncher.permissionsFilter(this, options) {
-
                 retrieveMedia()
             }
 
@@ -153,16 +154,18 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
 
     private fun initialise(context: FragmentActivity) {
         binding.permissionsLayout.permissionsLayout.hide()
-        binding.gridLayout.gridLayout.show()
+        if(options.showGallery) {
+            binding.gridLayout.gridLayout.show()
+        }
         cameraXManager = CameraXManager(binding.viewFinder, context, options).also {
             it.startCamera()
         }
+        updateGalleryViews()
         setupAdapters(context)
         setupFastScroller(context)
         observeSelectionList()
         retrieveMedia()
         setBottomSheetBehavior()
-        updateGalleryViews()
         setupControls()
         backPressController()
     }
@@ -221,14 +224,23 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                 options.preSelectedUrls.clear()
                 val results = set.map { it.contentUrl }
                 resultCallback?.invoke(PixEventCallback.Results(results)) ?: run {
-                    if (results.isNotEmpty()) {
-                        (activity as? PixActivity)?.navigate(R.id.action_navigation_image_preview,
-                            bundleOf(ARG_PARAM_PIX to PixEventCallback.Results(
+                    if (showPreview) {
+                        if (results.isNotEmpty()) {
+                            (activity as? PixActivity)?.navigate(R.id.action_navigation_image_preview,
+                                bundleOf(ARG_PARAM_PIX to PixEventCallback.Results(
+                                    results,
+                                    PixEventCallback.Status.SUCCESS
+                                )))
+                        } else {
+                            (activity as? PixActivity)?.finish()
+                        }
+                    } else {
+                        PixBus.returnObjects(
+                            event = PixEventCallback.Results(
                                 results,
                                 PixEventCallback.Status.SUCCESS
-                            )))
-                    } else {
-                        (activity as? PixActivity)?.finish()
+                            )
+                        )
                     }
                 }
             }

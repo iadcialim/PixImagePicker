@@ -101,18 +101,18 @@ fun AppCompatActivity.addPixToActivity(
  * Call this method in on create for Activity and onCreateView/onViewCreated in Fragment
  * */
 
-fun AppCompatActivity.registerPixCamera(options: Options?,
+fun AppCompatActivity.registerPixCamera(options: Options?, showImagePreview: Boolean = true,
                                      resultCallback: ((CameraActivityContract.CameraActivityResult) -> Unit)? = null)
 : ActivityResultLauncher<String> {
-    return registerForActivityResult(CameraActivityContract(options)) { result ->
+    return registerForActivityResult(CameraActivityContract(options, showImagePreview)) { result ->
         result?.let {
             resultCallback?.invoke(it)
         }
     }
 }
 
-fun launchPixCamera(resultLauncher: ActivityResultLauncher<String>, input: String) {
-    resultLauncher.launch(input)
+fun ActivityResultLauncher<String>.launchPixCamera(input: String) {
+    this.launch(input)
 }
 
 fun pixFragment(

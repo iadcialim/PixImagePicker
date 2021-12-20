@@ -9,6 +9,7 @@ import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
+import io.ak1.pix.helpers.launchPixCamera
 import io.ak1.pix.helpers.registerPixCamera
 import io.ak1.pix.models.*
 import io.ak1.pixsample.databinding.ActivityMainBinding
@@ -35,11 +36,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-        startResultActivity = registerPixCamera(null) { result ->
+        startResultActivity = registerPixCamera(options, showImagePreview = true) { result ->
             if(result.imageUriList?.isNotEmpty() == true) {
                 binding.demoImg.setImageURI(result.imageUriList?.get(0))
             }
-            Log.e("Images: ", "${result.id},   ${result.imageUriList}")
         }
     }
 
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun fragmentSampleClick(view: View) = startResultActivity?.launch("1")
+    fun fragmentSampleClick(view: View) = startResultActivity?.launchPixCamera("1")
 
     fun navControllerSampleClick(view: View) =
         startActivity(Intent(this, NavControllerSample::class.java))

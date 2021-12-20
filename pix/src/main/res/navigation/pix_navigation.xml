@@ -17,9 +17,9 @@
             app:popExitAnim="@anim/slide_out_right"
             app:destination="@id/navigation_image_preview"/>
     </fragment>
-    <dialog
+    <fragment
         android:id="@+id/navigation_image_preview"
-        android:name="io.ak1.pix.ui.ImagePreviewDialogFragment"
+        android:name="io.ak1.pix.ui.ImagePreviewFragment"
         android:label="@string/image_preview_fragment"
         tools:layout="@layout/dialog_image_preview"/>
 </navigation>

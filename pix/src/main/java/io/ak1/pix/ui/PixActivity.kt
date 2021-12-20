@@ -18,16 +18,16 @@ import io.ak1.pix.models.Mode
 import io.ak1.pix.models.Options
 import io.ak1.pix.models.Ratio
 import io.ak1.pix.utility.ARG_PARAM_PIX
+import io.ak1.pix.utility.ARG_PREVIEW_PIX
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * tracksynq-android
  *
  * Created by iad.guno on 01 December, 2021
- * Copyright © 2020 Quantum Inventions. All rights reserved.
+ *
  */
 
 /**
@@ -43,6 +43,7 @@ internal class PixActivity : AppCompatActivity() {
     private var id = ""
     var navController: NavController? = null
     companion object {
+        const val SHOW_PREVIEW = "show_preview"
         const val OPTIONS = "options"
         const val ID = "id"
         const val IMAGE_URI_LIST = "imageUriList"
@@ -68,14 +69,14 @@ internal class PixActivity : AppCompatActivity() {
         } else {
             defaultOptions
         }
-        val bundle = bundleOf(ARG_PARAM_PIX to options)
+        val showPreview = intent.extras?.getBoolean(SHOW_PREVIEW) ?: true
+        val bundle = bundleOf(ARG_PARAM_PIX to options, ARG_PREVIEW_PIX to showPreview)
         navController = findNavController(R.id.nav_host_fragment)
         navController?.setGraph(R.navigation.pix_navigation, bundle)
 
         PixBus.results(coroutineScope = CoroutineScope(Dispatchers.Main)) {
             when (it.status) {
                 PixEventCallback.Status.SUCCESS -> {
-                    showStatusBar()
                     val intent = Intent().apply {
                         putExtra(ID, id)
                         putStringArrayListExtra(IMAGE_URI_LIST, ArrayList(it.data.map { uri ->
@@ -83,6 +84,7 @@ internal class PixActivity : AppCompatActivity() {
                         }))
                     }
                     setResult(Activity.RESULT_OK, intent)
+//                    showStatusBar()
                     finish()
                 }
                 PixEventCallback.Status.BACK_PRESSED -> {
