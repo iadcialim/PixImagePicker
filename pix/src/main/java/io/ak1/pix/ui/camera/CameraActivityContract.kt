@@ -20,7 +20,7 @@ import io.ak1.pix.ui.PixActivity
  *
  * From https://proandroiddev.com/is-onactivityresult-deprecated-in-activity-results-api-lets-deep-dive-into-it-302d5cf6edd
  */
-class CameraActivityContract (private val options: Options? = null, private val showImagePreview: Boolean) :
+class CameraActivityContract :
     ActivityResultContract<String, CameraActivityContract.CameraActivityResult?>() {
 
     data class CameraActivityResult(val id: String, val imageUriList: List<Uri>?)
@@ -28,8 +28,6 @@ class CameraActivityContract (private val options: Options? = null, private val 
     override fun createIntent(context: Context, input: String): Intent {
         return Intent(context, PixActivity::class.java).apply {
             putExtra(PixActivity.ID, input)
-            putExtra(PixActivity.OPTIONS, options)
-            putExtra(PixActivity.SHOW_PREVIEW, showImagePreview)
         }
     }
 

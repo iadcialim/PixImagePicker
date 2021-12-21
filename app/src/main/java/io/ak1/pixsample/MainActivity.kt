@@ -36,8 +36,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
-        startResultActivity = registerPixCamera(options, showImagePreview = true) { result ->
-            if(result.imageUriList?.isNotEmpty() == true) {
+        options = getOptionsByPreference(this)
+        //need to declare options before this. any modifications in options after register wont reflect.
+        startResultActivity = registerPixCamera(options) { result ->
+            if (result.imageUriList?.isNotEmpty() == true) {
                 binding.demoImg.setImageURI(result.imageUriList?.get(0))
             }
         }
@@ -45,7 +47,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        options = getOptionsByPreference(this)
     }
 
     private fun getOptionsByPreference(mainActivity: MainActivity): Options {
@@ -88,6 +89,7 @@ class MainActivity : AppCompatActivity() {
             }
             spanCount = sp.getString("spanCount", "4")?.toInt() ?: 4
             showGallery = sp.getBoolean("showGallery", false)
+            showImagePreview = sp.getBoolean("showImagePreview", true)
         }
     }
 

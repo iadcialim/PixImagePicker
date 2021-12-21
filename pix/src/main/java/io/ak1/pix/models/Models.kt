@@ -40,6 +40,7 @@ class Options : Parcelable {
     var preSelectedUrls = ArrayList<Uri>()
     var videoOptions : VideoOptions = VideoOptions()
     var showGallery = true
+    var showImagePreview = true
 }
 
 @Parcelize

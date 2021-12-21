@@ -19,11 +19,18 @@ import java.util.*
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import androidx.lifecycle.MutableLiveData
 
-internal class ImagePagerAdapter(private val context: Context, private val images: List<Uri>) : PagerAdapter() {
+internal class ImagePagerAdapter(
+    private val context: Context,
+    private val images: List<Uri>,
+    private val loaderLD: MutableLiveData<Boolean>
+) : PagerAdapter() {
 
     // Layout Inflater
-    private var mLayoutInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private var mLayoutInflater: LayoutInflater =
+        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+
     override fun getCount(): Int {
         // return the number of images
         return images.size
@@ -49,20 +56,24 @@ internal class ImagePagerAdapter(private val context: Context, private val image
             .into(object :
                 CustomTarget<Bitmap>() {
                 override fun onLoadCleared(placeholder: Drawable?) {
+                    loaderLD.postValue(false)
                     previewImg.setImageDrawable(placeholder)
                 }
 
                 override fun onLoadStarted(placeholder: Drawable?) {
                     super.onLoadStarted(placeholder)
+                    loaderLD.postValue(false)
                     previewImg.setImageDrawable(placeholder)
                 }
 
                 override fun onLoadFailed(errorDrawable: Drawable?) {
                     super.onLoadFailed(errorDrawable)
+                    loaderLD.postValue(true)
                     previewImg.setImageDrawable(errorDrawable)
                 }
 
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    loaderLD.postValue(true)
                     previewImg.setImageBitmap(resource)
                 }
             })

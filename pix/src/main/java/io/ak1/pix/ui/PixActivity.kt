@@ -9,7 +9,6 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.get
 import io.ak1.pix.R
 import io.ak1.pix.helpers.*
@@ -18,7 +17,6 @@ import io.ak1.pix.models.Mode
 import io.ak1.pix.models.Options
 import io.ak1.pix.models.Ratio
 import io.ak1.pix.utility.ARG_PARAM_PIX
-import io.ak1.pix.utility.ARG_PREVIEW_PIX
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -42,8 +40,9 @@ internal class PixActivity : AppCompatActivity() {
      */
     private var id = ""
     var navController: NavController? = null
+    private lateinit var options: Options
+
     companion object {
-        const val SHOW_PREVIEW = "show_preview"
         const val OPTIONS = "options"
         const val ID = "id"
         const val IMAGE_URI_LIST = "imageUriList"
@@ -54,8 +53,8 @@ internal class PixActivity : AppCompatActivity() {
         setContentView(R.layout.activity_camera)
         setupScreen()
         supportActionBar?.hide()
-
         id = intent?.getStringExtra(ID) ?: ""
+        options = getOptionsParams() ?: defaultOptions
         lifecycleScope.launch {
             hideStatusBar()
             delay(200) // without the delay, the camera does not start
@@ -64,16 +63,12 @@ internal class PixActivity : AppCompatActivity() {
     }
 
     private fun showCameraFragment() {
-        val options = if(intent.extras?.containsKey(OPTIONS) == true) {
-             intent.extras?.getSerializable(OPTIONS) ?: defaultOptions
-        } else {
-            defaultOptions
-        }
-        val showPreview = intent.extras?.getBoolean(SHOW_PREVIEW) ?: true
-        val bundle = bundleOf(ARG_PARAM_PIX to options, ARG_PREVIEW_PIX to showPreview)
+        val bundle = bundleOf(ARG_PARAM_PIX to options)
         navController = findNavController(R.id.nav_host_fragment)
         navController?.setGraph(R.navigation.pix_navigation, bundle)
 
+        //receiving the result send from either PixFragment/ImagePreviewFragment and passing the result to the
+        //backstack activity where the receiver is registered if success.
         PixBus.results(coroutineScope = CoroutineScope(Dispatchers.Main)) {
             when (it.status) {
                 PixEventCallback.Status.SUCCESS -> {
@@ -103,7 +98,8 @@ internal class PixActivity : AppCompatActivity() {
         mode = Mode.Picture
         flash = Flash.Auto
         preSelectedUrls = ArrayList()
-        showGallery = false
+        showGallery = true
+        showImagePreview = true
     }
 
     override fun onBackPressed() {

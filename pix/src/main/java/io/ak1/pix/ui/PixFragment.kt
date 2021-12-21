@@ -14,7 +14,6 @@ import androidx.core.net.toFile
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
@@ -30,7 +29,6 @@ import io.ak1.pix.models.Options
 import io.ak1.pix.models.PixViewModel
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
-import io.ak1.pix.utility.ARG_PREVIEW_PIX
 import io.ak1.pix.utility.CustomItemTouchListener
 import kotlinx.coroutines.*
 import java.lang.Runnable
@@ -54,7 +52,7 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                     it.value
                 }) {
                 binding.permissionsLayout.permissionsLayout.hide()
-                if(options.showGallery)
+                if (options.showGallery)
                     binding.gridLayout.gridLayout.show()
                 else
                     binding.gridLayout.gridLayout.hide()
@@ -97,7 +95,7 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         options = arguments?.getParcelable(ARG_PARAM_PIX) ?: Options()
-        showPreview = arguments?.getBoolean(ARG_PREVIEW_PIX) ?: false
+        showPreview = options.showImagePreview
         colorPrimaryDark = requireActivity().color(R.color.primary_color_pix)
     }
 
@@ -154,9 +152,7 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
 
     private fun initialise(context: FragmentActivity) {
         binding.permissionsLayout.permissionsLayout.hide()
-        if(options.showGallery) {
-            binding.gridLayout.gridLayout.show()
-        }
+        binding.gridLayout.gridLayout.show()
         cameraXManager = CameraXManager(binding.viewFinder, context, options).also {
             it.startCamera()
         }
@@ -226,11 +222,15 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                 resultCallback?.invoke(PixEventCallback.Results(results)) ?: run {
                     if (showPreview) {
                         if (results.isNotEmpty()) {
-                            (activity as? PixActivity)?.navigate(R.id.action_navigation_image_preview,
-                                bundleOf(ARG_PARAM_PIX to PixEventCallback.Results(
-                                    results,
-                                    PixEventCallback.Status.SUCCESS
-                                )))
+                            (activity as? PixActivity)?.navigate(
+                                R.id.action_navigation_image_preview,
+                                bundleOf(
+                                    ARG_PARAM_PIX to PixEventCallback.Results(
+                                        results,
+                                        PixEventCallback.Status.SUCCESS
+                                    )
+                                )
+                            )
                         } else {
                             (activity as? PixActivity)?.finish()
                         }

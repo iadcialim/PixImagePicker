@@ -2,6 +2,7 @@ package io.ak1.pix.helpers
 
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -14,15 +15,14 @@ import io.ak1.pix.ui.PixFragment
 import io.ak1.pix.ui.camera.CameraActivityContract
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlinx.coroutines.*
+import kotlin.collections.ArrayList
+
 
 /**
  * Created By Akshay Sharma on 17,June,2021
@@ -37,7 +37,10 @@ open class PixEventCallback {
 
     @SuppressLint("ParcelCreator")
     @Parcelize
-    class Results(var results: List<Uri> = ArrayList(), var responseStatus: Status = Status.SUCCESS) : Parcelable {
+    class Results(
+        var results: List<Uri> = ArrayList(),
+        var responseStatus: Status = Status.SUCCESS
+    ) : Parcelable {
         @IgnoredOnParcel
         val data: List<Uri> = results
 
@@ -99,18 +102,31 @@ fun AppCompatActivity.addPixToActivity(
 
 /**
  * Call this method in on create for Activity and onCreateView/onViewCreated in Fragment
+ * This method registers the launcher in the activity to receive the result.
  * */
 
-fun AppCompatActivity.registerPixCamera(options: Options?, showImagePreview: Boolean = true,
-                                     resultCallback: ((CameraActivityContract.CameraActivityResult) -> Unit)? = null)
-: ActivityResultLauncher<String> {
-    return registerForActivityResult(CameraActivityContract(options, showImagePreview)) { result ->
+fun AppCompatActivity.registerPixCamera(
+    options: Options?,
+    resultCallback: ((CameraActivityContract.CameraActivityResult) -> Unit)? = null
+)
+        : ActivityResultLauncher<String> {
+    setOptionsParam(options)
+    return registerForActivityResult(CameraActivityContract()) { result ->
         result?.let {
             resultCallback?.invoke(it)
         }
     }
 }
 
+private var options: Options? = null
+fun setOptionsParam(customOptions: Options?) {
+    options = customOptions
+}
+fun getOptionsParams() = options
+
+/**
+ * Launch the ActivityResultLauncher registered in Activity.
+ * */
 fun ActivityResultLauncher<String>.launchPixCamera(input: String) {
     this.launch(input)
 }
@@ -138,6 +154,17 @@ fun FragmentManager.resetMedia(preSelectedUrls: ArrayList<Uri> = ArrayList()) {
         })
     )
 
+}
+
+/**
+ * delete images from internal as well as external storage
+ * */
+fun Context.deleteImage(
+    deletedImageUri: Uri,
+    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+) = coroutineScope.launch {
+    deleteFile(deletedImageUri.pathSegments.last())
+    contentResolver.delete(deletedImageUri, null, null)
 }
 // TODO: 18/06/21 more usability methods to be added
 // TODO: 18/06/21 add documentation for usability methods
