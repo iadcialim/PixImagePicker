@@ -103,5 +103,6 @@ class MainActivity : AppCompatActivity() {
 
     fun openSettings(view: View) {
         startActivity(Intent(this, SettingsActivity::class.java))
+        finish()
     }
 }

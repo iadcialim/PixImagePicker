@@ -30,6 +30,7 @@ import io.ak1.pix.models.PixViewModel
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
 import io.ak1.pix.utility.CustomItemTouchListener
+import io.ak1.pix.utility.IMG_PICKER
 import kotlinx.coroutines.*
 import java.lang.Runnable
 import kotlin.coroutines.cancellation.CancellationException
@@ -45,6 +46,8 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
     private val model: PixViewModel by viewModels()
     private var _binding: FragmentPixBinding? = null
     private val binding get() = _binding!!
+    // identifier to check which mode is checked (camera(1)/gallery(2)/video(3))
+    private var imagePickerOption = 2
 
     private var permReqLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
@@ -222,13 +225,16 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                 resultCallback?.invoke(PixEventCallback.Results(results)) ?: run {
                     if (showPreview) {
                         if (results.isNotEmpty()) {
+                            if (mBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
+                                mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+                            }
                             (activity as? PixActivity)?.navigate(
                                 R.id.action_navigation_image_preview,
                                 bundleOf(
                                     ARG_PARAM_PIX to PixEventCallback.Results(
                                         results,
                                         PixEventCallback.Status.SUCCESS
-                                    )
+                                    ), IMG_PICKER to imagePickerOption
                                 )
                             )
                         } else {
@@ -283,7 +289,8 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
     }
 
     private fun setupControls() {
-        binding.setupClickControls(model, cameraXManager, options) { int, uri ->
+        binding.setupClickControls(model, cameraXManager, options) { int, uri, camMode ->
+            imagePickerOption = camMode
             when (int) {
                 0 -> model.returnObjects()
                 1 -> mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED

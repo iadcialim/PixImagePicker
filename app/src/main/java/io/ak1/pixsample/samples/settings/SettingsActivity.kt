@@ -7,6 +7,13 @@ import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
 import io.ak1.pixsample.R
 import io.ak1.pixsample.databinding.SettingsActivityBinding
+import android.content.Intent
+import android.view.MenuItem
+
+import io.ak1.pixsample.MainActivity
+
+
+
 
 
 class SettingsActivity : AppCompatActivity() {
@@ -22,6 +29,19 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                val intent = Intent(this@SettingsActivity, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+                finish()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     class SettingsFragment : PreferenceFragmentCompat() {

@@ -1,6 +1,5 @@
 package io.ak1.pix.ui.image_pager
 
-import android.widget.LinearLayout
 import android.view.ViewGroup
 import android.content.Context
 import android.graphics.Bitmap
@@ -83,6 +82,6 @@ internal class ImagePagerAdapter(
     }
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-        container.removeView(`object` as LinearLayout)
+        container.removeView(`object` as ConstraintLayout)
     }
 }

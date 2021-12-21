@@ -13,6 +13,7 @@ import io.ak1.pix.helpers.PixEventCallback
 import io.ak1.pix.helpers.deleteImage
 import io.ak1.pix.ui.image_pager.ImagePagerAdapter
 import io.ak1.pix.utility.ARG_PARAM_PIX
+import io.ak1.pix.utility.IMG_PICKER
 
 /**
  *
@@ -28,6 +29,7 @@ class ImagePreviewFragment : PixBaseFragment() {
     private var uriList: PixEventCallback.Results? = null
     //observer to check the image resource callback status
     private var loaderLD: MutableLiveData<Boolean> = MutableLiveData(false)
+    private var imagePickerOption = 2
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,6 +37,7 @@ class ImagePreviewFragment : PixBaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         uriList = arguments?.getParcelable(ARG_PARAM_PIX) ?: PixEventCallback.Results()
+        imagePickerOption = arguments?.getInt(IMG_PICKER) ?: 2
         dialogImageBinding =
             DataBindingUtil.inflate(inflater, R.layout.dialog_image_preview, container, false)
         return dialogImageBinding?.root
@@ -44,13 +47,15 @@ class ImagePreviewFragment : PixBaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         dialogImageBinding?.cancelBtn?.setOnClickListener {
             //if images are not required/accepted, deleting images from internal as well as external storage.
-            val data = uriList?.data
-            data?.apply {
-                if (this.size == 1) {
-                    (activity as? PixActivity)?.deleteImage(this[0])
-                } else {
-                    this.forEach {
-                        requireActivity().deleteImage(it)
+            if (imagePickerOption == 1) {
+                val data = uriList?.data
+                data?.apply {
+                    if (this.size == 1) {
+                        (activity as? PixActivity)?.deleteImage(this[0])
+                    } else {
+                        this.forEach {
+                            requireActivity().deleteImage(it)
+                        }
                     }
                 }
             }

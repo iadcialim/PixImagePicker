@@ -31,4 +31,5 @@ internal val IMAGE_VIDEO_URI = MediaStore.Files.getContentUri("external")!!
 internal const val IMAGE_VIDEO_ORDER_BY = MediaStore.Images.Media.DATE_MODIFIED + " DESC"
 var WIDTH = 0
 const val ARG_PARAM_PIX = "param_pix"
+const val IMG_PICKER = "image_picker_option"
 internal const val ARG_PARAM_PIX_KEY = "param_pix_key"
