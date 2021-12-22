@@ -1,4 +1,4 @@
-package io.ak1.pix.ui
+package io.ak1.pix
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -14,19 +14,21 @@ import androidx.core.net.toFile
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import io.ak1.pix.R
 import io.ak1.pix.adapters.InstantImageAdapter
 import io.ak1.pix.adapters.MainImageAdapter
 import io.ak1.pix.databinding.FragmentPixBinding
 import io.ak1.pix.helpers.*
 import io.ak1.pix.interfaces.OnSelectionListener
 import io.ak1.pix.models.Img
+import io.ak1.pix.models.Mode
 import io.ak1.pix.models.Options
 import io.ak1.pix.models.PixViewModel
+import io.ak1.pix.ui.PixActivity
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
 import io.ak1.pix.utility.CustomItemTouchListener
@@ -41,11 +43,12 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 
 class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Unit)? = null) :
-    PixBaseFragment(), View.OnTouchListener {
+    Fragment(), View.OnTouchListener {
 
     private val model: PixViewModel by viewModels()
     private var _binding: FragmentPixBinding? = null
     private val binding get() = _binding!!
+
     // identifier to check which mode is checked (camera(1)/gallery(2)/video(3))
     private var imagePickerOption = 2
 
@@ -97,8 +100,12 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requireActivity().let {
+            it.setupScreen()
+            it.actionBar?.hide()
+        }
         options = arguments?.getParcelable(ARG_PARAM_PIX) ?: Options()
-        showPreview = options.showImagePreview
+        showPreview = options.showPreview
         colorPrimaryDark = requireActivity().color(R.color.primary_color_pix)
     }
 
@@ -228,15 +235,31 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                             if (mBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
                                 mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
                             }
-                            (activity as? PixActivity)?.navigate(
-                                R.id.action_navigation_image_preview,
-                                bundleOf(
-                                    ARG_PARAM_PIX to PixEventCallback.Results(
-                                        results,
-                                        PixEventCallback.Status.SUCCESS
-                                    ), IMG_PICKER to imagePickerOption
+                            if (imagePickerOption == 1 || imagePickerOption == 2) {
+                                //show image preview fragment
+                                (activity as? PixActivity)?.navigate(
+                                    R.id.action_navigation_image_preview,
+                                    bundleOf(
+                                        ARG_PARAM_PIX to PixEventCallback.Results(
+                                            results,
+                                            PixEventCallback.Status.SUCCESS,
+                                            mode = Mode.Picture
+                                        ), IMG_PICKER to imagePickerOption
+                                    )
                                 )
-                            )
+                            } else {
+                                //show video preview fragment
+                                (activity as? PixActivity)?.navigate(
+                                    R.id.action_navigation_video_preview,
+                                    bundleOf(
+                                        ARG_PARAM_PIX to PixEventCallback.Results(
+                                            results,
+                                            PixEventCallback.Status.SUCCESS,
+                                            mode = Mode.Video
+                                        )
+                                    )
+                                )
+                            }
                         } else {
                             (activity as? PixActivity)?.finish()
                         }
@@ -244,7 +267,9 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                         PixBus.returnObjects(
                             event = PixEventCallback.Results(
                                 results,
-                                PixEventCallback.Status.SUCCESS
+                                PixEventCallback.Status.SUCCESS,
+                                if (imagePickerOption == 1 || imagePickerOption == 2)
+                                    Mode.Picture else Mode.Video,
                             )
                         )
                     }

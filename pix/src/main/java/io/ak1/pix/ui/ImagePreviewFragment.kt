@@ -7,10 +7,11 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import io.ak1.pix.R
-import io.ak1.pix.databinding.DialogImagePreviewBinding
+import io.ak1.pix.databinding.FragmentImagePreviewBinding
 import io.ak1.pix.helpers.PixBus
 import io.ak1.pix.helpers.PixEventCallback
 import io.ak1.pix.helpers.deleteImage
+import io.ak1.pix.models.Mode
 import io.ak1.pix.ui.image_pager.ImagePagerAdapter
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.IMG_PICKER
@@ -19,14 +20,16 @@ import io.ak1.pix.utility.IMG_PICKER
  *
  * Created by Pritam Dasgupta on 17th December, 2021
  *
- * show fragment with image(s) if showImagePreview from option model is passed as true
+ * show fragment with image(s) if showPreview from option model is passed as true
  */
 
 class ImagePreviewFragment : PixBaseFragment() {
 
-    private var dialogImageBinding: DialogImagePreviewBinding? = null
+    private var fragmentImageBinding: FragmentImagePreviewBinding? = null
+
     //model to fetch the image(s) from arguments
     private var uriList: PixEventCallback.Results? = null
+
     //observer to check the image resource callback status
     private var loaderLD: MutableLiveData<Boolean> = MutableLiveData(false)
     private var imagePickerOption = 2
@@ -38,14 +41,14 @@ class ImagePreviewFragment : PixBaseFragment() {
     ): View? {
         uriList = arguments?.getParcelable(ARG_PARAM_PIX) ?: PixEventCallback.Results()
         imagePickerOption = arguments?.getInt(IMG_PICKER) ?: 2
-        dialogImageBinding =
-            DataBindingUtil.inflate(inflater, R.layout.dialog_image_preview, container, false)
-        return dialogImageBinding?.root
+        fragmentImageBinding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_image_preview, container, false)
+        return fragmentImageBinding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        dialogImageBinding?.cancelBtn?.setOnClickListener {
+        fragmentImageBinding?.cancelBtn?.setOnClickListener {
             //if images are not required/accepted, deleting images from internal as well as external storage.
             if (imagePickerOption == 1) {
                 val data = uriList?.data
@@ -62,24 +65,25 @@ class ImagePreviewFragment : PixBaseFragment() {
             (activity as? PixActivity)?.navController?.navigateUp()
         }
 
-        dialogImageBinding?.doneBtn?.setOnClickListener {
+        fragmentImageBinding?.doneBtn?.setOnClickListener {
             //sending the model to the PixActivity to collect the data.
             uriList?.apply {
                 PixBus.returnObjects(
                     event = PixEventCallback.Results(
                         this.data,
-                        PixEventCallback.Status.SUCCESS
+                        PixEventCallback.Status.SUCCESS,
+                        Mode.Picture
                     )
                 )
             }
         }
         loaderLD.observe(viewLifecycleOwner, {
             it?.apply {
-                dialogImageBinding?.cancelBtn?.visibility = if (this) View.VISIBLE else View.GONE
-                dialogImageBinding?.doneBtn?.visibility = if (this) View.VISIBLE else View.GONE
+                fragmentImageBinding?.cancelBtn?.visibility = if (this) View.VISIBLE else View.GONE
+                fragmentImageBinding?.doneBtn?.visibility = if (this) View.VISIBLE else View.GONE
             }
         })
-        dialogImageBinding?.imagePager?.adapter = ImagePagerAdapter(
+        fragmentImageBinding?.imagePager?.adapter = ImagePagerAdapter(
             requireContext(),
             uriList?.data ?: arrayListOf(), loaderLD
         )

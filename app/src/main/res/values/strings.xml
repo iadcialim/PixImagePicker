@@ -26,5 +26,5 @@
     <string name="flash_title">Flash</string>
     <string name="theme_header">Theme</string>
     <string name="mode_title">Capture mode</string>
-    <string name="show_image_preview">Show Image Preview</string>
+    <string name="show_preview">Show Image/Video Preview</string>
 </resources>

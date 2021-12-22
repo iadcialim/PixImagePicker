@@ -54,8 +54,8 @@
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
-            app:key="showImagePreview"
-            app:title="@string/show_image_preview" />
+            app:key="showPreview"
+            app:title="@string/show_preview" />
 
         <ListPreference
             app:defaultValue="0"

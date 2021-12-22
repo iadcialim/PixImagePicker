@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import io.ak1.pix.models.*
-import io.ak1.pix.ui.PixFragment
+import io.ak1.pix.PixFragment
 import io.ak1.pix.ui.camera.CameraActivityContract
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
@@ -35,17 +35,25 @@ open class PixEventCallback {
         SUCCESS, BACK_PRESSED
     }
 
+    enum class CameraMode {
+        PICTURE, VIDEO
+    }
+
     @SuppressLint("ParcelCreator")
     @Parcelize
     class Results(
         var results: List<Uri> = ArrayList(),
-        var responseStatus: Status = Status.SUCCESS
+        var responseStatus: Status = Status.SUCCESS,
+        var mode: Mode = Mode.Picture
     ) : Parcelable {
         @IgnoredOnParcel
         val data: List<Uri> = results
 
         @IgnoredOnParcel
         val status: Status = responseStatus
+
+        @IgnoredOnParcel
+        val cameraMode: Mode = mode
     }
 
     private val backPressedEvents = MutableSharedFlow<Any>()

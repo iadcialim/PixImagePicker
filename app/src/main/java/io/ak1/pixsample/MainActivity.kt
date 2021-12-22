@@ -13,7 +13,6 @@ import io.ak1.pix.helpers.launchPixCamera
 import io.ak1.pix.helpers.registerPixCamera
 import io.ak1.pix.models.*
 import io.ak1.pixsample.databinding.ActivityMainBinding
-import io.ak1.pixsample.samples.FragmentSample
 import io.ak1.pixsample.samples.NavControllerSample
 import io.ak1.pixsample.samples.ViewPager2Sample
 import io.ak1.pixsample.samples.settings.SettingsActivity
@@ -37,8 +36,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.hide()
         options = getOptionsByPreference(this)
-        //need to declare options before this. any modifications in options after register wont reflect.
         startResultActivity = registerPixCamera(options) { result ->
+            Log.e("Mode:", result.cameraMode.toString())
             if (result.imageUriList?.isNotEmpty() == true) {
                 binding.demoImg.setImageURI(result.imageUriList?.get(0))
             }
@@ -89,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             }
             spanCount = sp.getString("spanCount", "4")?.toInt() ?: 4
             showGallery = sp.getBoolean("showGallery", false)
-            showImagePreview = sp.getBoolean("showImagePreview", true)
+            showPreview = sp.getBoolean("showPreview", true)
         }
     }
 
