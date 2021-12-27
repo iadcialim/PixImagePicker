@@ -45,7 +45,6 @@ internal class PixActivity : AppCompatActivity() {
     companion object {
         const val OPTIONS = "options"
         const val ID = "id"
-        const val MODE = "mode"
         const val IMAGE_URI_LIST = "imageUriList"
     }
 
@@ -75,7 +74,6 @@ internal class PixActivity : AppCompatActivity() {
                 PixEventCallback.Status.SUCCESS -> {
                     val intent = Intent().apply {
                         putExtra(ID, id)
-                        putExtra(MODE, if(it.cameraMode == Mode.Picture) 1 else 2 )
                         putStringArrayListExtra(IMAGE_URI_LIST, ArrayList(it.data.map { uri ->
                             uri.toString()
                         }))

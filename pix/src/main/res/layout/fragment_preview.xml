@@ -36,8 +36,8 @@
             android:layout_marginRight="12dp"
             tools:ignore="VectorDrawableCompat" />
 
-        <io.ak1.pix.ui.image_pager.ImagePager
-            android:id="@+id/imagePager"
+        <io.ak1.pix.ui.image_video_pager.ImageVideoPager
+            android:id="@+id/imageVideoPager"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintStart_toStartOf="parent"

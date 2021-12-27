@@ -1,4 +1,4 @@
-package io.ak1.pix.ui.image_pager
+package io.ak1.pix.ui.image_video_pager
 
 import android.content.Context
 import android.util.AttributeSet
@@ -10,7 +10,7 @@ import java.lang.IllegalArgumentException
  * */
 
 //https://stackoverflow.com/a/59543453
-class ImagePager @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+class ImageVideoPager @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ViewPager(context, attrs) {
 
     override fun onTouchEvent(ev: MotionEvent?): Boolean {

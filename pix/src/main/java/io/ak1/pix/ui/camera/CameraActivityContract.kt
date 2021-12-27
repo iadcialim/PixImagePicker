@@ -28,7 +28,7 @@ class CameraActivityContract :
      * @param cameraMode - pass 1 for picture and 2 for video
      * @param imageUriList - pass the image(s) or the video uri
     * */
-    data class CameraActivityResult(val id: String, val cameraMode: Int, val imageUriList: List<Uri>?)
+    data class CameraActivityResult(val id: String, val imageUriList: List<Uri>?)
 
     override fun createIntent(context: Context, input: String): Intent {
         return Intent(context, PixActivity::class.java).apply {
@@ -41,10 +41,9 @@ class CameraActivityContract :
         intent: Intent?
     ): CameraActivityResult? {
         val id = intent?.getStringExtra(PixActivity.ID)
-        val mode = intent?.getIntExtra(PixActivity.MODE, 1) ?: 1
         val data = intent?.getStringArrayListExtra(PixActivity.IMAGE_URI_LIST)
         return if (resultCode == Activity.RESULT_OK && !id.isNullOrBlank() && data != null) {
-            CameraActivityResult(id,mode, data.toList().map {
+            CameraActivityResult(id, data.toList().map {
                 Uri.parse(it)
             })
         } else {

@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.hide()
         options = getOptionsByPreference(this)
         startResultActivity = registerPixCamera(options) { result ->
-            Log.e("Mode:", result.cameraMode.toString())
             if (result.imageUriList?.isNotEmpty() == true) {
                 binding.demoImg.setImageURI(result.imageUriList?.get(0))
             }

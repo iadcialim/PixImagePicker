@@ -235,31 +235,15 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                             if (mBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
                                 mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
                             }
-                            if (imagePickerOption == 1 || imagePickerOption == 2) {
-                                //show image preview fragment
-                                (activity as? PixActivity)?.navigate(
-                                    R.id.action_navigation_image_preview,
-                                    bundleOf(
-                                        ARG_PARAM_PIX to PixEventCallback.Results(
-                                            results,
-                                            PixEventCallback.Status.SUCCESS,
-                                            mode = Mode.Picture
-                                        ), IMG_PICKER to imagePickerOption
-                                    )
+                            (activity as? PixActivity)?.navigate(
+                                R.id.action_navigation_image_video_preview,
+                                bundleOf(
+                                    ARG_PARAM_PIX to PixEventCallback.Results(
+                                        results,
+                                        PixEventCallback.Status.SUCCESS
+                                    ), IMG_PICKER to imagePickerOption
                                 )
-                            } else {
-                                //show video preview fragment
-                                (activity as? PixActivity)?.navigate(
-                                    R.id.action_navigation_video_preview,
-                                    bundleOf(
-                                        ARG_PARAM_PIX to PixEventCallback.Results(
-                                            results,
-                                            PixEventCallback.Status.SUCCESS,
-                                            mode = Mode.Video
-                                        )
-                                    )
-                                )
-                            }
+                            )
                         } else {
                             (activity as? PixActivity)?.finish()
                         }
@@ -267,9 +251,7 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                         PixBus.returnObjects(
                             event = PixEventCallback.Results(
                                 results,
-                                PixEventCallback.Status.SUCCESS,
-                                if (imagePickerOption == 1 || imagePickerOption == 2)
-                                    Mode.Picture else Mode.Video,
+                                PixEventCallback.Status.SUCCESS
                             )
                         )
                     }

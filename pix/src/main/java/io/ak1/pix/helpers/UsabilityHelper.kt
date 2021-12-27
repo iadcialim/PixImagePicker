@@ -43,17 +43,13 @@ open class PixEventCallback {
     @Parcelize
     class Results(
         var results: List<Uri> = ArrayList(),
-        var responseStatus: Status = Status.SUCCESS,
-        var mode: Mode = Mode.Picture
+        var responseStatus: Status = Status.SUCCESS
     ) : Parcelable {
         @IgnoredOnParcel
         val data: List<Uri> = results
 
         @IgnoredOnParcel
         val status: Status = responseStatus
-
-        @IgnoredOnParcel
-        val cameraMode: Mode = mode
     }
 
     private val backPressedEvents = MutableSharedFlow<Any>()
@@ -174,5 +170,23 @@ fun Context.deleteImage(
     deleteFile(deletedImageUri.pathSegments.last())
     contentResolver.delete(deletedImageUri, null, null)
 }
+
+/**
+ * Check the mimetype of the data from uri
+ * Below are the valid type for images.
+ * */
+private val imageMimeTypes = arrayOf("image/jpeg",
+    "image/bmp",
+    "image/gif",
+    "image/jpg",
+    "image/png")
+
+fun Context.getMimeType(uri: Uri): PixEventCallback.CameraMode {
+    return if (imageMimeTypes.contains(contentResolver.getType(uri)))
+        PixEventCallback.CameraMode.PICTURE
+    else
+        PixEventCallback.CameraMode.VIDEO
+}
+
 // TODO: 18/06/21 more usability methods to be added
 // TODO: 18/06/21 add documentation for usability methods
