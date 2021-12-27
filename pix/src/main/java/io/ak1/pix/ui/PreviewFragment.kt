@@ -7,25 +7,18 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
-import com.google.android.exoplayer2.source.MediaSourceFactory
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
 import io.ak1.pix.R
 import io.ak1.pix.databinding.FragmentPreviewBinding
 import io.ak1.pix.helpers.PixBus
 import io.ak1.pix.helpers.PixEventCallback
 import io.ak1.pix.helpers.deleteImage
-import io.ak1.pix.models.Mode
 import io.ak1.pix.ui.image_video_pager.ImageVideoPagerAdapter
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.IMG_PICKER
+
+/**
+ * Created by Pritam Dasgupta on 27th December, 2021
+ * */
 
 class PreviewFragment: PixBaseFragment() {
     private var fragmentPreviewBinding: FragmentPreviewBinding? = null
