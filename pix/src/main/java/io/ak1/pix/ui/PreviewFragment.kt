@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import com.google.android.exoplayer2.DefaultLoadControl
@@ -41,9 +42,19 @@ class PreviewFragment: PixBaseFragment() {
         savedInstanceState: Bundle?
     ): View? {
         uriList = arguments?.getParcelable(ARG_PARAM_PIX) ?: PixEventCallback.Results()
-        isCameraClicked = arguments?.getInt(IMG_PICKER) == 1
+        isCameraClicked = arguments?.getInt(IMG_PICKER) == 1 || arguments?.getInt(IMG_PICKER) == 3
         fragmentPreviewBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_preview, container, false)
+        requireActivity()
+            .onBackPressedDispatcher
+            .addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (isCameraClicked) {
+                        deleteImagesVideos()
+                    }
+                    (activity as? PixActivity)?.navController?.navigateUp()
+                }
+            })
         return fragmentPreviewBinding?.root
     }
 
@@ -52,16 +63,7 @@ class PreviewFragment: PixBaseFragment() {
         fragmentPreviewBinding?.cancelBtn?.setOnClickListener {
             //if images are not required/accepted, deleting images from internal as well as external storage.
             if (isCameraClicked) {
-                val data = uriList?.data
-                data?.apply {
-                    if (this.size == 1) {
-                        (activity as? PixActivity)?.deleteImage(this[0])
-                    } else {
-                        this.forEach {
-                            requireActivity().deleteImage(it)
-                        }
-                    }
-                }
+                deleteImagesVideos()
             }
             (activity as? PixActivity)?.navController?.navigateUp()
         }
@@ -87,5 +89,18 @@ class PreviewFragment: PixBaseFragment() {
             requireContext(),
             uriList?.data ?: arrayListOf(), loaderLD
         )
+    }
+
+    private fun deleteImagesVideos() {
+        val data = uriList?.data
+        data?.apply {
+            if (this.size == 1) {
+                (activity as? PixActivity)?.deleteImage(this[0])
+            } else {
+                this.forEach {
+                    requireActivity().deleteImage(it)
+                }
+            }
+        }
     }
 }
