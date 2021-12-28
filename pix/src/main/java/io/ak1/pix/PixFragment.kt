@@ -1,6 +1,7 @@
 package io.ak1.pix
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -231,12 +232,7 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                 val results = set.map { it.contentUrl }
                 resultCallback?.let {
                     it.invoke(PixEventCallback.Results(results))
-                    PixBus.returnObjects(
-                        event = PixEventCallback.Results(
-                            results,
-                            PixEventCallback.Status.SUCCESS
-                        )
-                    )
+                    sendPixResults(results, PixEventCallback.Status.SUCCESS)
                 } ?: run {
                     if (showPreview) {
                         if (results.isNotEmpty()) {
@@ -252,27 +248,26 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                                     ), IMG_PICKER to imagePickerOption
                                 )
                             ) ?: run {
-                                PixBus.returnObjects(
-                                    event = PixEventCallback.Results(
-                                        results,
-                                        PixEventCallback.Status.SUCCESS
-                                    )
-                                )
+                                sendPixResults(results, PixEventCallback.Status.SUCCESS)
                             }
                         } else {
                             (activity as? PixActivity)?.finish()
                         }
                     } else {
-                        PixBus.returnObjects(
-                            event = PixEventCallback.Results(
-                                results,
-                                PixEventCallback.Status.SUCCESS
-                            )
-                        )
+                        sendPixResults(results, PixEventCallback.Status.SUCCESS)
                     }
                 }
             }
         }
+    }
+
+    private fun sendPixResults(results: List<Uri>, status: PixEventCallback.Status) {
+        PixBus.returnObjects(
+            event = PixEventCallback.Results(
+                results,
+                status
+            )
+        )
     }
 
     @SuppressLint("ClickableViewAccessibility")
