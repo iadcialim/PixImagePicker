@@ -229,7 +229,15 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                 model.selectionList.postValue(HashSet())
                 options.preSelectedUrls.clear()
                 val results = set.map { it.contentUrl }
-                resultCallback?.invoke(PixEventCallback.Results(results)) ?: run {
+                resultCallback?.let {
+                    it.invoke(PixEventCallback.Results(results))
+                    PixBus.returnObjects(
+                        event = PixEventCallback.Results(
+                            results,
+                            PixEventCallback.Status.SUCCESS
+                        )
+                    )
+                } ?: run {
                     if (showPreview) {
                         if (results.isNotEmpty()) {
                             if (mBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -243,7 +251,14 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                                         PixEventCallback.Status.SUCCESS
                                     ), IMG_PICKER to imagePickerOption
                                 )
-                            )
+                            ) ?: run {
+                                PixBus.returnObjects(
+                                    event = PixEventCallback.Results(
+                                        results,
+                                        PixEventCallback.Status.SUCCESS
+                                    )
+                                )
+                            }
                         } else {
                             (activity as? PixActivity)?.finish()
                         }

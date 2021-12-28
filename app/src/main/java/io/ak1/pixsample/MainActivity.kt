@@ -13,6 +13,7 @@ import io.ak1.pix.helpers.launchPixCamera
 import io.ak1.pix.helpers.registerPixCamera
 import io.ak1.pix.models.*
 import io.ak1.pixsample.databinding.ActivityMainBinding
+import io.ak1.pixsample.samples.FragmentSample
 import io.ak1.pixsample.samples.NavControllerSample
 import io.ak1.pixsample.samples.ViewPager2Sample
 import io.ak1.pixsample.samples.settings.SettingsActivity
@@ -91,13 +92,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun fragmentSampleClick(view: View) = startResultActivity?.launchPixCamera("1")
+    fun fragmentSampleClick(view: View) =
+        startActivity(Intent(this, FragmentSample::class.java))
 
     fun navControllerSampleClick(view: View) =
         startActivity(Intent(this, NavControllerSample::class.java))
 
     fun viewPager2SampleClick(view: View) =
         startActivity(Intent(this, ViewPager2Sample::class.java))
+
+    fun pixActivitySampleClick(view: View) = startResultActivity?.launchPixCamera("1")
 
     fun openSettings(view: View) {
         startActivity(Intent(this, SettingsActivity::class.java))
