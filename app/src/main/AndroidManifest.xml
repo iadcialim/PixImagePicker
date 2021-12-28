@@ -22,6 +22,7 @@
         <activity android:name=".samples.ViewPager2Sample" />
         <activity android:name=".samples.NavControllerSample" />
         <activity android:name=".samples.FragmentSample" />
+        <activity android:name=".samples.PixActivitySample"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
