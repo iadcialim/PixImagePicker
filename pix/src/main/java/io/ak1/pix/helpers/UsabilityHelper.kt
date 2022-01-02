@@ -12,7 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import io.ak1.pix.models.*
 import io.ak1.pix.PixFragment
-import io.ak1.pix.ui.camera.CameraActivityContract
+import io.ak1.pix.ui.camera.PixActivityContract
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -109,13 +109,10 @@ fun AppCompatActivity.addPixToActivity(
  * This method registers the launcher in the activity to receive the result.
  * */
 
-fun AppCompatActivity.registerPixCamera(
-    options: Options?,
-    resultCallback: ((CameraActivityContract.CameraActivityResult) -> Unit)? = null
-)
-        : ActivityResultLauncher<String> {
-    setOptionsParam(options)
-    return registerForActivityResult(CameraActivityContract()) { result ->
+fun AppCompatActivity.registerPixActivity(
+    resultCallback: ((PixActivityContract.PixActivityResult) -> Unit)? = null
+): ActivityResultLauncher<PixActivityContract.PixActivityInput> {
+    return registerForActivityResult(PixActivityContract()) { result ->
         result?.let {
             resultCallback?.invoke(it)
         }
@@ -123,9 +120,7 @@ fun AppCompatActivity.registerPixCamera(
 }
 
 private var options: Options? = null
-fun setOptionsParam(customOptions: Options?) {
-    options = customOptions
-}
+
 fun getOptionsParams() = options
 
 /**
@@ -175,11 +170,13 @@ fun Context.deleteImage(
  * Check the mimetype of the data from uri
  * Below are the valid type for images.
  * */
-private val imageMimeTypes = arrayOf("image/jpeg",
+private val imageMimeTypes = arrayOf(
+    "image/jpeg",
     "image/bmp",
     "image/gif",
     "image/jpg",
-    "image/png")
+    "image/png"
+)
 
 fun Context.getMimeType(uri: Uri): PixEventCallback.CameraMode {
     return if (imageMimeTypes.contains(contentResolver.getType(uri)))

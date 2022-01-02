@@ -2,67 +2,65 @@ package io.ak1.pixsample.samples
 
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
+import io.ak1.pix.helpers.getOptionsParams
+import io.ak1.pix.helpers.registerPixActivity
 import io.ak1.pix.helpers.setupScreen
 import io.ak1.pix.helpers.showStatusBar
-import io.ak1.pixsample.IMAGE_VIDEOS_URI
+import io.ak1.pix.models.Flash
+import io.ak1.pix.models.Mode
+import io.ak1.pix.models.Options
+import io.ak1.pix.models.Ratio
+import io.ak1.pix.ui.camera.PixActivityContract
 import io.ak1.pixsample.R
-import io.ak1.pixsample.commons.Adapter
-import io.ak1.pixsample.custom.fragmentBody2
-import java.util.ArrayList
 
 class PixActivitySample : AppCompatActivity() {
 
-    private val resultsFragment = PixActivityResultsFragment()
+    private val defaultOptions = Options().apply {
+        ratio = Ratio.RATIO_AUTO
+        count = 3
+        spanCount = 4
+        path = "Camera"
+        isFrontFacing = false
+        mode = Mode.All
+        flash = Flash.Auto
+        preSelectedUrls = ArrayList()
+        showGallery = true
+        showPreview = true
+    }
+
+    private val resultsFragment = ResultsFragment {
+        // show the camera
+        pixActivityResultLauncher.launch(
+            PixActivityContract.PixActivityInput(
+                "anyIdWillDoForNow",
+                getOptionsParams() ?: defaultOptions
+            )
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fragment_sample)
         setupScreen()
         supportActionBar?.hide()
-        val uriList = intent.getParcelableArrayListExtra<Uri>(IMAGE_VIDEOS_URI)
-        uriList?.apply {
-            showResultsFragment(this)
-        } ?: finish()
+        showResultsFragment()
     }
 
-    private fun showResultsFragment(imageUriList: ArrayList<Uri>) {
+    private var pixActivityResultLauncher = registerPixActivity { result ->
+        if (result.imageUriList?.isNotEmpty() == true) {
+            updateResults(result.imageUriList!!)
+        }
+    }
+
+    private fun updateResults(imageUriList: List<Uri>) {
+        showResultsFragment()
+        resultsFragment.setList(imageUriList)
+    }
+
+    private fun showResultsFragment() {
         showStatusBar()
-        val bundle = Bundle()
-        bundle.putParcelableArrayList(IMAGE_VIDEOS_URI, imageUriList)
-        resultsFragment.arguments = bundle
-        supportFragmentManager
-            .beginTransaction()
+        supportFragmentManager.beginTransaction()
             .replace(R.id.container, resultsFragment).commit()
-    }
-}
-
-class PixActivityResultsFragment : Fragment() {
-    private val customAdapter = Adapter()
-
-    private fun setList(list: List<Uri>) {
-        customAdapter.apply {
-            this.list.clear()
-            this.list.addAll(list)
-            notifyDataSetChanged()
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = fragmentBody2(requireActivity(), customAdapter)
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val imageUriList = arguments?.getParcelableArrayList<Uri>(IMAGE_VIDEOS_URI)
-        imageUriList?.apply {
-            setList(this)
-        }
     }
 }

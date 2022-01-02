@@ -3,7 +3,6 @@ package io.ak1.pix.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
@@ -12,10 +11,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.get
 import io.ak1.pix.R
 import io.ak1.pix.helpers.*
-import io.ak1.pix.models.Flash
-import io.ak1.pix.models.Mode
 import io.ak1.pix.models.Options
-import io.ak1.pix.models.Ratio
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,11 +36,11 @@ internal class PixActivity : AppCompatActivity() {
      */
     private var id = ""
     var navController: NavController? = null
-    private lateinit var options: Options
+    private var options: Options? = null
 
     companion object {
         const val OPTIONS = "options"
-        const val ID = "id"
+        const val REQUEST_ID = "requestId"
         const val IMAGE_URI_LIST = "imageUriList"
     }
 
@@ -53,8 +49,9 @@ internal class PixActivity : AppCompatActivity() {
         setContentView(R.layout.activity_camera)
         setupScreen()
         supportActionBar?.hide()
-        id = intent?.getStringExtra(ID) ?: ""
-        options = getOptionsParams() ?: defaultOptions
+        id = intent?.getStringExtra(REQUEST_ID) ?: ""
+        options = getOptionsParams()
+
         lifecycleScope.launch {
             hideStatusBar()
             delay(200) // without the delay, the camera does not start
@@ -73,13 +70,13 @@ internal class PixActivity : AppCompatActivity() {
             when (it.status) {
                 PixEventCallback.Status.SUCCESS -> {
                     val intent = Intent().apply {
-                        putExtra(ID, id)
+                        putExtra(REQUEST_ID, id)
                         putStringArrayListExtra(IMAGE_URI_LIST, ArrayList(it.data.map { uri ->
                             uri.toString()
                         }))
                     }
                     setResult(Activity.RESULT_OK, intent)
-//                    showStatusBar()
+                    // showStatusBar()
                     finish()
                 }
                 PixEventCallback.Status.BACK_PRESSED -> {
@@ -87,19 +84,6 @@ internal class PixActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private val defaultOptions = Options().apply {
-        ratio = Ratio.RATIO_AUTO
-        count = 1
-        spanCount = 4
-        path = "Camera"
-        isFrontFacing = false
-        mode = Mode.Picture
-        flash = Flash.Auto
-        preSelectedUrls = ArrayList()
-        showGallery = true
-        showPreview = true
     }
 
     override fun onBackPressed() {

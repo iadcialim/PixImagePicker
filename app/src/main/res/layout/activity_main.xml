@@ -80,7 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
         android:background="@color/white"
-        android:onClick="pixActivityImplClick"
+        android:onClick="pixActivitySampleClick"
         android:gravity="center_vertical"
         android:minHeight="72dp"
         android:padding="24dp"

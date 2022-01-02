@@ -3,17 +3,10 @@
 package io.ak1.pixsample
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
-import android.util.Log
 import android.view.View
-import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import io.ak1.pix.helpers.launchPixCamera
-import io.ak1.pix.helpers.registerPixCamera
-import io.ak1.pix.helpers.showStatusBar
 import io.ak1.pix.models.*
 import io.ak1.pixsample.databinding.ActivityMainBinding
 import io.ak1.pixsample.samples.FragmentSample
@@ -22,7 +15,6 @@ import io.ak1.pixsample.samples.PixActivitySample
 import io.ak1.pixsample.samples.ViewPager2Sample
 import io.ak1.pixsample.samples.settings.SettingsActivity
 
-
 /**
  * Created By Akshay Sharma on 18,June,2021
  * https://ak1.io
@@ -30,11 +22,9 @@ import io.ak1.pixsample.samples.settings.SettingsActivity
 internal const val TAG = "Pix logs"
 
 var options = Options()
-const val IMAGE_VIDEOS_URI = "image_videos_uri"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private var startResultActivity: ActivityResultLauncher<String>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,11 +32,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         supportActionBar?.hide()
         options = getOptionsByPreference(this)
-        startResultActivity = registerPixCamera(options) { result ->
-            if (result.imageUriList?.isNotEmpty() == true) {
-                pixActivitySampleClick(result.imageUriList!! as ArrayList<Uri>)
-            }
-        }
     }
 
     private fun getOptionsByPreference(mainActivity: MainActivity): Options {
@@ -93,12 +78,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun pixActivitySampleClick(imageUriList: ArrayList<Uri>) {
-        startActivity(Intent(this, PixActivitySample::class.java).also {
-            it.putParcelableArrayListExtra(IMAGE_VIDEOS_URI, imageUriList)
-        })
-    }
-
     fun fragmentSampleClick(view: View) =
         startActivity(Intent(this, FragmentSample::class.java))
 
@@ -108,10 +87,11 @@ class MainActivity : AppCompatActivity() {
     fun viewPager2SampleClick(view: View) =
         startActivity(Intent(this, ViewPager2Sample::class.java))
 
-    fun pixActivityImplClick(view: View) = startResultActivity?.launchPixCamera("1")
+    fun pixActivitySampleClick(view: View) {
+        startActivity(Intent(this, PixActivitySample::class.java))
+    }
 
     fun openSettings(view: View) {
         startActivity(Intent(this, SettingsActivity::class.java))
-        finish()
     }
 }
