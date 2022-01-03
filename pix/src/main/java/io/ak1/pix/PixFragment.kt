@@ -105,6 +105,7 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
             it.setupScreen()
             it.actionBar?.hide()
         }
+
         options = arguments?.getParcelable(ARG_PARAM_PIX) ?: Options()
         showPreview = options.showPreview
         colorPrimaryDark = requireActivity().color(R.color.primary_color_pix)

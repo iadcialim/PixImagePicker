@@ -119,17 +119,6 @@ fun AppCompatActivity.registerPixActivity(
     }
 }
 
-private var options: Options? = null
-
-fun getOptionsParams() = options
-
-/**
- * Launch the ActivityResultLauncher registered in Activity.
- * */
-fun ActivityResultLauncher<String>.launchPixCamera(input: String) {
-    this.launch(input)
-}
-
 fun pixFragment(
     options: Options,
     resultCallback: ((PixEventCallback.Results) -> Unit)? = null

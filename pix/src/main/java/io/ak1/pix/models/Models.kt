@@ -4,9 +4,8 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Parcelable
 import kotlinx.parcelize.IgnoredOnParcel
-
 import kotlinx.parcelize.Parcelize
-import java.util.*
+import java.util.ArrayList
 
 /**
  * Created By Akshay Sharma on 17,June,2021
@@ -29,32 +28,33 @@ data class Img(
 
 @SuppressLint("ParcelCreator")
 @Parcelize
-class Options : Parcelable {
-    var ratio = Ratio.RATIO_AUTO
-    var count = 1
-    var spanCount = 4
-    var path = "Pix/Camera"
-    var isFrontFacing = false
-    var mode = Mode.All
-    var flash = Flash.Auto
-    var preSelectedUrls = ArrayList<Uri>()
-    var videoOptions : VideoOptions = VideoOptions()
-    var showGallery = true
-    var showPreview = true
-}
+class Options(
+    var ratio: Ratio = Ratio.RATIO_AUTO,
+    var count: Int = 1,
+    var spanCount: Int = 4,
+    var path: String = "Pix/Camera",
+    var isFrontFacing: Boolean = false,
+    var mode: Mode = Mode.All,
+    var flash: Flash = Flash.Auto,
+    var preSelectedUrls: ArrayList<Uri> = ArrayList<Uri>(),
+    var videoOptions: VideoOptions = VideoOptions(),
+    var showGallery: Boolean = true,
+    var showPreview: Boolean = true,
+) : Parcelable
 
 @Parcelize
 enum class Mode : Parcelable {
     All, Picture, Video
 }
+
 @SuppressLint("ParcelCreator")
 @Parcelize
-class VideoOptions : Parcelable {
-    var videoBitrate : Int? = null
-    var audioBitrate : Int? = null
-    var videoFrameRate : Int? = null
-    var videoDurationLimitInSeconds = 10
-}
+class VideoOptions(
+    var videoBitrate: Int? = null,
+    var audioBitrate: Int? = null,
+    var videoFrameRate: Int? = null,
+    var videoDurationLimitInSeconds: Int = 10
+) : Parcelable
 
 @Parcelize
 enum class Flash : Parcelable {

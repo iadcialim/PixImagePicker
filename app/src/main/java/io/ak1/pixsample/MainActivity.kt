@@ -31,6 +31,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         supportActionBar?.hide()
+    }
+
+    override fun onResume() {
+        super.onResume()
         options = getOptionsByPreference(this)
     }
 

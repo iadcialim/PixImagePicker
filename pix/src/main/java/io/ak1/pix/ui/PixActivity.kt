@@ -50,8 +50,7 @@ internal class PixActivity : AppCompatActivity() {
         setupScreen()
         supportActionBar?.hide()
         id = intent?.getStringExtra(REQUEST_ID) ?: ""
-        options = getOptionsParams()
-
+        options = intent?.getParcelableExtra(OPTIONS) as? Options
         lifecycleScope.launch {
             hideStatusBar()
             delay(200) // without the delay, the camera does not start
