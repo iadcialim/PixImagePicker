@@ -39,6 +39,7 @@ internal class ImageVideoPagerAdapter(
 ) : PagerAdapter() {
 
     private var exoPlayer: SimpleExoPlayer? = null
+
     // Layout Inflater
     private var mLayoutInflater: LayoutInflater =
         context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -55,7 +56,7 @@ internal class ImageVideoPagerAdapter(
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val mimeType = context.getMimeType(imagesVideosList[position])
         val itemView: View
-        if(mimeType == PixEventCallback.CameraMode.PICTURE) {
+        if (mimeType == PixEventCallback.CameraMode.PICTURE) {
             itemView = mLayoutInflater.inflate(R.layout.item_photo_viewer, container, false)
             loadImageItemView(itemView, container, position)
         } else {
@@ -76,16 +77,22 @@ internal class ImageVideoPagerAdapter(
     }
 
     private fun initializePlayer(position: Int): SimpleExoPlayer {
-        val mediaDataSourceFactory = DefaultDataSourceFactory(context, Util.getUserAgent(context,
-            "pixMediaPlayer"))
+        val mediaDataSourceFactory = DefaultDataSourceFactory(
+            context, Util.getUserAgent(
+                context,
+                "pixMediaPlayer"
+            )
+        )
 
         val mediaSource = ProgressiveMediaSource.Factory(mediaDataSourceFactory).createMediaSource(
-            MediaItem.fromUri(imagesVideosList[position]))
+            MediaItem.fromUri(imagesVideosList[position])
+        )
 
         val trackSelector = DefaultTrackSelector(context)
         val loadControl = DefaultLoadControl()
 
-        val mediaSourceFactory: MediaSourceFactory = DefaultMediaSourceFactory(mediaDataSourceFactory)
+        val mediaSourceFactory: MediaSourceFactory =
+            DefaultMediaSourceFactory(mediaDataSourceFactory)
         val exoPlayer = SimpleExoPlayer.Builder(context)
             .setMediaSourceFactory(mediaSourceFactory)
             .setTrackSelector(trackSelector)
@@ -96,7 +103,7 @@ internal class ImageVideoPagerAdapter(
         return exoPlayer
     }
 
-    private fun loadImageItemView(itemView: View,container: ViewGroup, position: Int) {
+    private fun loadImageItemView(itemView: View, container: ViewGroup, position: Int) {
         val previewImg: PhotoView = itemView.findViewById(R.id.previewImg) as PhotoView
         val drawable = CircularProgressDrawable(context)
         drawable.colorFilter = PorterDuffColorFilter(0xff3CE330.toInt(), PorterDuff.Mode.SRC_IN)

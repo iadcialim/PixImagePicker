@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.ak1.pix.adapters.InstantImageAdapter
 import io.ak1.pix.adapters.MainImageAdapter
@@ -233,11 +234,15 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                     it.invoke(PixEventCallback.Results(results))
                     sendPixResults(results, PixEventCallback.Status.SUCCESS)
                 } ?: run {
-                    if (showPreview) {
-                        if (results.isNotEmpty()) {
-                            if (mBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
-                                mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
-                            }
+                    if (showPreview && activity is PixActivity) {
+                        var delay = 0L
+                        if (mBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
+                            delay = 100
+                        }
+
+                        requireActivity()?.actionBar?.hide() // hide first
+                        lifecycleScope.launch {
+                            delay(delay) // then navigate after some delay
                             (activity as? PixActivity)?.navigate(
                                 R.id.action_navigation_image_video_preview,
                                 bundleOf(
@@ -246,11 +251,11 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                                         PixEventCallback.Status.SUCCESS
                                     ), IMG_PICKER to imagePickerOption
                                 )
-                            ) ?: run {
-                                sendPixResults(results, PixEventCallback.Status.SUCCESS)
+                            )
+
+                            if (delay > 0) {
+                                mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
                             }
-                        } else {
-                            (activity as? PixActivity)?.finish()
                         }
                     } else {
                         sendPixResults(results, PixEventCallback.Status.SUCCESS)

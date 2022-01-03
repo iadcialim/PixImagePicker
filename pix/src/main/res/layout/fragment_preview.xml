@@ -9,31 +9,29 @@
 
         <ImageView
             android:id="@+id/cancelBtn"
-            android:layout_width="@dimen/h0"
-            android:layout_height="@dimen/h0"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/bg_indicator_circle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_btn_clear"
             android:elevation="5dp"
-            android:layout_marginLeft="12dp"
             tools:ignore="VectorDrawableCompat" />
 
         <ImageView
             android:id="@+id/doneBtn"
-            android:layout_width="@dimen/h0"
+            android:layout_width="@dimen/icon_size"
             android:background="@drawable/bg_indicator_circle"
-            android:layout_marginTop="15dp"
-            android:layout_height="@dimen/h0"
-            android:layout_marginEnd="15dp"
+            android:layout_marginTop="12dp"
+            android:layout_height="@dimen/icon_size"
+            android:layout_marginEnd="12dp"
             android:padding="5dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_select_tick"
             android:elevation="5dp"
-            android:layout_marginRight="12dp"
             tools:ignore="VectorDrawableCompat" />
 
         <io.ak1.pix.preview.pager.ImageVideoPager

@@ -96,7 +96,7 @@ class PreviewFragment : Fragment() {
             uriList?.data ?: arrayListOf(), loaderLD
         )
     }
-
+    
     private fun deleteImagesVideos() {
         val data = uriList?.data
         data?.apply {

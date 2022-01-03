@@ -63,7 +63,7 @@ class PixActivity : AppCompatActivity() {
     private fun showCameraFragment() {
         val bundle = bundleOf(ARG_PARAM_PIX to options)
         navController = findNavController(R.id.nav_host_fragment)
-        navController?.setGraph(R.navigation.pix_navigation, bundle)
+        navController?.setGraph(R.navigation.pix_activity_navigation, bundle)
 
         //receiving the result send from either PixFragment/ImagePreviewFragment and passing the result to the
         //backstack activity where the receiver is registered if success.
@@ -88,8 +88,9 @@ class PixActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (navController?.currentDestination == navController?.graph?.get(R.id.navigation_pix)) {
-            PixBus.onBackPressedEvent()
+        if (navController?.currentDestination == navController?.graph?.get(R.id.pix_fragment)) {
+            setResult(Activity.RESULT_CANCELED, intent)
+            finish()
         } else {
             super.onBackPressed()
         }
