@@ -26,10 +26,8 @@ import io.ak1.pix.databinding.FragmentPixBinding
 import io.ak1.pix.helpers.*
 import io.ak1.pix.interfaces.OnSelectionListener
 import io.ak1.pix.models.Img
-import io.ak1.pix.models.Mode
 import io.ak1.pix.models.Options
 import io.ak1.pix.models.PixViewModel
-import io.ak1.pix.ui.PixActivity
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
 import io.ak1.pix.utility.CustomItemTouchListener

@@ -13,7 +13,7 @@
         android:maxSdkVersion="28" />
     <application>
         <activity
-            android:name="io.ak1.pix.ui.PixActivity"
+            android:name="io.ak1.pix.PixActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateVisible|adjustResize"

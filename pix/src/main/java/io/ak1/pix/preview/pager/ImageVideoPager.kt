@@ -1,4 +1,4 @@
-package io.ak1.pix.ui.image_video_pager
+package io.ak1.pix.preview.pager
 
 import android.content.Context
 import android.util.AttributeSet

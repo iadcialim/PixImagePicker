@@ -65,6 +65,7 @@ class FragmentSample : AppCompatActivity() {
         else
             PixBus.onBackPressedEvent()
     }
+
 }
 
 class ResultsFragment(private val clickCallback: View.OnClickListener) : Fragment() {

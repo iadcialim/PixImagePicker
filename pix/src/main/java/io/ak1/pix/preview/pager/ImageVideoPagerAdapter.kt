@@ -1,4 +1,4 @@
-package io.ak1.pix.ui.image_video_pager
+package io.ak1.pix.preview.pager
 
 import android.view.ViewGroup
 import android.content.Context
@@ -18,7 +18,6 @@ import java.util.*
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.MediaItem
@@ -29,7 +28,6 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.util.Util
 import io.ak1.pix.helpers.PixEventCallback
 import io.ak1.pix.helpers.getMimeType

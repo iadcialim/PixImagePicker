@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_image_video_preview"
-        android:name="io.ak1.pix.ui.PreviewFragment"
+        android:name="io.ak1.pix.preview.PreviewFragment"
         android:label="@string/image_video_preview_fragment"
         tools:layout="@layout/fragment_preview"/>
 </navigation>

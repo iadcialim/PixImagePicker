@@ -3,10 +3,9 @@ package io.ak1.pixsample.samples
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import io.ak1.pix.helpers.registerPixActivity
+import io.ak1.pix.PixActivityContract
 import io.ak1.pix.helpers.setupScreen
 import io.ak1.pix.helpers.showStatusBar
-import io.ak1.pix.ui.camera.PixActivityContract
 import io.ak1.pixsample.R
 import io.ak1.pixsample.options
 
@@ -29,11 +28,14 @@ class PixActivitySample : AppCompatActivity() {
         showResultsFragment()
     }
 
-    private var pixActivityResultLauncher = registerPixActivity { result ->
-        if (result.imageUriList?.isNotEmpty() == true) {
-            updateResults(result.imageUriList!!)
+    private var pixActivityResultLauncher =
+        registerForActivityResult(PixActivityContract()) { result ->
+            result?.let {
+                if (it.imageUriList?.isNotEmpty() == true) {
+                    updateResults(it.imageUriList!!)
+                }
+            }
         }
-    }
 
     private fun updateResults(imageUriList: List<Uri>) {
         showResultsFragment()

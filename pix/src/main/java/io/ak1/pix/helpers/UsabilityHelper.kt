@@ -10,9 +10,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
+import io.ak1.pix.PixActivityContract
 import io.ak1.pix.models.*
 import io.ak1.pix.PixFragment
-import io.ak1.pix.ui.camera.PixActivityContract
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -102,21 +102,6 @@ fun AppCompatActivity.addPixToActivity(
                 putParcelable(ARG_PARAM_PIX, options)
             }
         }).commit()
-}
-
-/**
- * Call this method in on create for Activity and onCreateView/onViewCreated in Fragment
- * This method registers the launcher in the activity to receive the result.
- * */
-
-fun AppCompatActivity.registerPixActivity(
-    resultCallback: ((PixActivityContract.PixActivityResult) -> Unit)? = null
-): ActivityResultLauncher<PixActivityContract.PixActivityInput> {
-    return registerForActivityResult(PixActivityContract()) { result ->
-        result?.let {
-            resultCallback?.invoke(it)
-        }
-    }
 }
 
 fun pixFragment(

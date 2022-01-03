@@ -1,15 +1,17 @@
-package io.ak1.pix.ui
+package io.ak1.pix
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.get
-import io.ak1.pix.R
 import io.ak1.pix.helpers.*
 import io.ak1.pix.models.Options
 import io.ak1.pix.utility.ARG_PARAM_PIX
@@ -29,7 +31,7 @@ import kotlinx.coroutines.launch
  *
  * @constructor Create empty Camera activity
  */
-internal class PixActivity : AppCompatActivity() {
+class PixActivity : AppCompatActivity() {
 
     /**
      * This is like the ID or source of the request
@@ -95,5 +97,60 @@ internal class PixActivity : AppCompatActivity() {
 
     fun navigate(navId: Int, destinationArgs: Bundle? = null) {
         navController?.navigate(navId, destinationArgs)
+    }
+}
+
+/**
+ * PixActivity Result Contract
+ *
+ * From https://proandroiddev.com/is-onactivityresult-deprecated-in-activity-results-api-lets-deep-dive-into-it-302d5cf6edd
+ */
+class PixActivityContract :
+    ActivityResultContract<PixActivityContract.PixActivityInput, PixActivityContract.PixActivityResult?>() {
+
+    /**
+     * Wrapper class for the input of this launcher
+     *
+     * @param requestId - pass the request id (similar to REQUEST_CODE in the old API)
+     * @param options - see [Options]
+     *
+     * */
+    data class PixActivityInput(
+        val requestId: String,
+        val options: Options,
+    )
+
+    /**
+     * Wrapper class for the result of this launcher
+     *
+     * @param requestId - pass the request id (similar to REQUEST_CODE in the old API)
+     * @param imageUriList - return the image(s) or the video URIs
+     *
+     * */
+    data class PixActivityResult(val requestId: String, val imageUriList: List<Uri>?)
+
+    override fun createIntent(
+        context: Context,
+        input: PixActivityInput
+    ): Intent {
+        return Intent(context, PixActivity::class.java).apply {
+            putExtra(PixActivity.REQUEST_ID, input.requestId)
+            putExtra(PixActivity.OPTIONS, input.options)
+        }
+    }
+
+    override fun parseResult(
+        resultCode: Int,
+        intent: Intent?
+    ): PixActivityResult? {
+        val id = intent?.getStringExtra(PixActivity.REQUEST_ID) ?: ""
+        val data = intent?.getStringArrayListExtra(PixActivity.IMAGE_URI_LIST)
+        return if (resultCode == Activity.RESULT_OK && !id.isNullOrBlank() && data != null) {
+            PixActivityResult(id, data.toList().map {
+                Uri.parse(it)
+            })
+        } else {
+            null
+        }
     }
 }
