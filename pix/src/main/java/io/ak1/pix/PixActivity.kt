@@ -48,7 +48,7 @@ class PixActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_camera)
+        setContentView(R.layout.activity_pix)
         setupScreen()
         supportActionBar?.hide()
         id = intent?.getStringExtra(REQUEST_ID) ?: ""

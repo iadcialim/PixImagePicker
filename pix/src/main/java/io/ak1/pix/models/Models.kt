@@ -34,12 +34,12 @@ class Options(
     var spanCount: Int = 4,
     var path: String = "Pix/Camera",
     var isFrontFacing: Boolean = false,
-    var mode: Mode = Mode.All,
+    var mode: Mode = Mode.Picture,
     var flash: Flash = Flash.Auto,
     var preSelectedUrls: ArrayList<Uri> = ArrayList<Uri>(),
     var videoOptions: VideoOptions = VideoOptions(),
-    var showGallery: Boolean = true,
-    var showPreview: Boolean = true,
+    var showGallery: Boolean = false,
+    var showPreview: Boolean = false,
 ) : Parcelable
 
 @Parcelize
