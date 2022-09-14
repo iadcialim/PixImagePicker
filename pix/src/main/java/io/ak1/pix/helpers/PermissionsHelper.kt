@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -49,6 +50,10 @@ fun ActivityResultLauncher<Array<String>>.permissionsFilter(
     options: Options,
     callback: () -> Unit
 ) {
+    Log.d(
+        "permissionsFilter",
+        "mode=${options.mode}, path=${options.path}, showGallery=${options.showGallery}"
+    )
     if (fragmentActivity.allPermissionsGranted(options.mode)) {
         callback()
     } else {

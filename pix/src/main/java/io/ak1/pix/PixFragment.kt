@@ -1,6 +1,7 @@
 package io.ak1.pix
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,12 +12,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toFile
+import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.ak1.pix.adapters.InstantImageAdapter
 import io.ak1.pix.adapters.MainImageAdapter
@@ -29,6 +32,7 @@ import io.ak1.pix.models.PixViewModel
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
 import io.ak1.pix.utility.CustomItemTouchListener
+import io.ak1.pix.utility.IMG_PICKER
 import kotlinx.coroutines.*
 import java.lang.Runnable
 import kotlin.coroutines.cancellation.CancellationException
@@ -45,13 +49,19 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
     private var _binding: FragmentPixBinding? = null
     private val binding get() = _binding!!
 
+    // identifier to check which mode is checked (camera(1)/gallery(2)/video(3))
+    private var imagePickerOption = 2
+
     private var permReqLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             if (permissions.all {
                     it.value
                 }) {
                 binding.permissionsLayout.permissionsLayout.hide()
-                binding.gridLayout.gridLayout.show()
+                if (options.showGallery)
+                    binding.gridLayout.gridLayout.show()
+                else
+                    binding.gridLayout.gridLayout.hide()
                 initialise(requireActivity())
             } else {
                 binding.gridLayout.gridLayout.hide()
@@ -65,6 +75,7 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
     private var mBottomSheetBehavior: BottomSheetBehavior<View>? = null
     private var scope = CoroutineScope(Dispatchers.IO)
     private var colorPrimaryDark = 0
+    private var showPreview: Boolean = false
 
     override fun onResume() {
         super.onResume()
@@ -89,12 +100,18 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        options = arguments?.getParcelable(ARG_PARAM_PIX) ?: Options()
         requireActivity().let {
             it.setupScreen()
             it.actionBar?.hide()
-            colorPrimaryDark = it.color(R.color.primary_color_pix)
         }
+
+        options = arguments?.getParcelable(ARG_PARAM_PIX) ?: Options()
+        Log.d(
+            "onCreate",
+            "mode=${options.mode}, path=${options.path}, showGallery=${options.showGallery}"
+        )
+        showPreview = options.showPreview
+        colorPrimaryDark = requireActivity().color(R.color.primary_color_pix)
     }
 
 
@@ -127,7 +144,6 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                 }
             }
             permReqLauncher.permissionsFilter(this, options) {
-
                 retrieveMedia()
             }
 
@@ -155,12 +171,12 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
         cameraXManager = CameraXManager(binding.viewFinder, context, options).also {
             it.startCamera()
         }
+        updateGalleryViews()
         setupAdapters(context)
         setupFastScroller(context)
         observeSelectionList()
         retrieveMedia()
         setBottomSheetBehavior()
-        updateGalleryViews()
         setupControls()
         backPressController()
     }
@@ -218,15 +234,48 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
                 model.selectionList.postValue(HashSet())
                 options.preSelectedUrls.clear()
                 val results = set.map { it.contentUrl }
-                resultCallback?.invoke(PixEventCallback.Results(results))
-                PixBus.returnObjects(
-                    event = PixEventCallback.Results(
-                        results,
-                        PixEventCallback.Status.SUCCESS
-                    )
-                )
+                resultCallback?.let {
+                    it.invoke(PixEventCallback.Results(results))
+                    sendPixResults(results, PixEventCallback.Status.SUCCESS)
+                } ?: run {
+                    if (showPreview && activity is PixActivity) {
+                        var delay = 0L
+                        if (mBottomSheetBehavior?.state == BottomSheetBehavior.STATE_EXPANDED) {
+                            delay = 100
+                        }
+
+                        requireActivity()?.actionBar?.hide() // hide first
+                        lifecycleScope.launch {
+                            delay(delay) // then navigate after some delay
+                            (activity as? PixActivity)?.navigate(
+                                R.id.action_navigation_image_video_preview,
+                                bundleOf(
+                                    ARG_PARAM_PIX to PixEventCallback.Results(
+                                        results,
+                                        PixEventCallback.Status.SUCCESS
+                                    ), IMG_PICKER to imagePickerOption
+                                )
+                            )
+
+                            if (delay > 0) {
+                                mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED
+                            }
+                        }
+                    } else {
+                        sendPixResults(results, PixEventCallback.Status.SUCCESS)
+                    }
+                }
             }
         }
+    }
+
+    private fun sendPixResults(results: List<Uri>, status: PixEventCallback.Status) {
+        PixBus.returnObjects(
+            event = PixEventCallback.Results(
+                results,
+                status
+            )
+        )
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -265,7 +314,8 @@ class PixFragment(private val resultCallback: ((PixEventCallback.Results) -> Uni
     }
 
     private fun setupControls() {
-        binding.setupClickControls(model, cameraXManager, options) { int, uri ->
+        binding.setupClickControls(model, cameraXManager, options) { int, uri, camMode ->
+            imagePickerOption = camMode
             when (int) {
                 0 -> model.returnObjects()
                 1 -> mBottomSheetBehavior?.state = BottomSheetBehavior.STATE_COLLAPSED

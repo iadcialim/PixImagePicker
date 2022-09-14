@@ -74,7 +74,7 @@ internal fun FragmentPixBinding.setupClickControls(
     model: PixViewModel,
     cameraXManager: CameraXManager?,
     options: Options,
-    callback: (Int, Uri) -> Unit
+    callback: (Int, Uri, Int) -> Unit
 ) {
     gridLayout.controlsLayout.messageBottom.setText(
         when (options.mode) {
@@ -97,7 +97,7 @@ internal fun FragmentPixBinding.setupClickControls(
             cameraXManager?.takePhoto { uri, exc ->
                 if (exc == null) {
                     val newUri = Uri.parse(uri.toString())
-                    callback(3, newUri)
+                    callback(3, newUri, 1)
                 } else {
                     Log.e(TAG, "$exc")
                 }
@@ -118,7 +118,7 @@ internal fun FragmentPixBinding.setupClickControls(
                 gridLayout.sendButton.context.toast(model.selectionListSize)
                 return@setOnLongClickListener false
             }
-            callback(4, Uri.EMPTY)
+            callback(4, Uri.EMPTY, 3)
             isRecording = true
             videoCounterLayout.videoCounterLayout.show()
             videoCounterProgress = 0
@@ -137,7 +137,7 @@ internal fun FragmentPixBinding.setupClickControls(
                             alpha = 1f
                             translationY = 0f
                         }
-                        callback(5, Uri.EMPTY)
+                        callback(5, Uri.EMPTY, 3)
                         isRecording = false
                         videoCounterLayout.videoCounterLayout.hide()
                         videoCounterHandler.removeCallbacks(videoCounterRunnable)
@@ -157,7 +157,7 @@ internal fun FragmentPixBinding.setupClickControls(
                 .setDuration(200).start()
             cameraXManager?.takeVideo { uri, exc ->
                 if (exc == null) {
-                    callback(3, uri)
+                    callback(3, uri, 3)
                 } else {
                     Log.e(TAG, "$exc")
                 }
@@ -191,7 +191,7 @@ internal fun FragmentPixBinding.setupClickControls(
                     alpha = 1f
                     translationY = 0f
                 }
-                callback(5, Uri.EMPTY)
+                callback(5, Uri.EMPTY, 2)
                 isRecording = false
                 videoCounterLayout.videoCounterLayout.hide()
                 videoCounterHandler.removeCallbacks(videoCounterRunnable)
@@ -200,12 +200,12 @@ internal fun FragmentPixBinding.setupClickControls(
             }
             false
         }
-        gridLayout.selectionOk.setOnClickListener { callback(0, Uri.EMPTY) }
-        gridLayout.sendButton.setOnClickListener { callback(0, Uri.EMPTY) }
-        gridLayout.selectionBack.setOnClickListener { callback(1, Uri.EMPTY) }
+        gridLayout.selectionOk.setOnClickListener { callback(0, Uri.EMPTY, 2) }
+        gridLayout.sendButton.setOnClickListener { callback(0, Uri.EMPTY, 2) }
+        gridLayout.selectionBack.setOnClickListener { callback(1, Uri.EMPTY, 2) }
         gridLayout.selectionCheck.setOnClickListener {
             gridLayout.selectionCheck.hide()
-            callback(2, Uri.EMPTY)
+            callback(2, Uri.EMPTY, 2)
         }
     }
     gridLayout.controlsLayout.flashButton.setOnClickForFLash(options) {

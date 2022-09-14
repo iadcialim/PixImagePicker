@@ -1,22 +1,28 @@
 package io.ak1.pix.helpers
 
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
+import io.ak1.pix.PixActivityContract
+import io.ak1.pix.models.*
 import io.ak1.pix.PixFragment
-import io.ak1.pix.models.Options
 import io.ak1.pix.utility.ARG_PARAM_PIX
 import io.ak1.pix.utility.ARG_PARAM_PIX_KEY
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
+import kotlinx.coroutines.*
+import kotlin.collections.ArrayList
+
 
 /**
  * Created By Akshay Sharma on 17,June,2021
@@ -29,10 +35,22 @@ open class PixEventCallback {
         SUCCESS, BACK_PRESSED
     }
 
-    data class Results(
-        var data: List<Uri> = ArrayList(),
-        var status: Status = Status.SUCCESS
-    )
+    enum class CameraMode {
+        PICTURE, VIDEO
+    }
+
+    @SuppressLint("ParcelCreator")
+    @Parcelize
+    class Results(
+        var results: List<Uri> = ArrayList(),
+        var responseStatus: Status = Status.SUCCESS
+    ) : Parcelable {
+        @IgnoredOnParcel
+        val data: List<Uri> = results
+
+        @IgnoredOnParcel
+        val status: Status = responseStatus
+    }
 
     private val backPressedEvents = MutableSharedFlow<Any>()
     private val outputEvents = MutableSharedFlow<Results>()
@@ -110,5 +128,36 @@ fun FragmentManager.resetMedia(preSelectedUrls: ArrayList<Uri> = ArrayList()) {
     )
 
 }
+
+/**
+ * delete images from internal as well as external storage
+ * */
+fun Context.deleteImage(
+    deletedImageUri: Uri,
+    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+) = coroutineScope.launch {
+    deleteFile(deletedImageUri.pathSegments.last())
+    contentResolver.delete(deletedImageUri, null, null)
+}
+
+/**
+ * Check the mimetype of the data from uri
+ * Below are the valid type for images.
+ * */
+private val imageMimeTypes = arrayOf(
+    "image/jpeg",
+    "image/bmp",
+    "image/gif",
+    "image/jpg",
+    "image/png"
+)
+
+fun Context.getMimeType(uri: Uri): PixEventCallback.CameraMode {
+    return if (imageMimeTypes.contains(contentResolver.getType(uri)))
+        PixEventCallback.CameraMode.PICTURE
+    else
+        PixEventCallback.CameraMode.VIDEO
+}
+
 // TODO: 18/06/21 more usability methods to be added
 // TODO: 18/06/21 add documentation for usability methods

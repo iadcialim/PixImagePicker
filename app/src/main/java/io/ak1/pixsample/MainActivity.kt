@@ -11,9 +11,9 @@ import io.ak1.pix.models.*
 import io.ak1.pixsample.databinding.ActivityMainBinding
 import io.ak1.pixsample.samples.FragmentSample
 import io.ak1.pixsample.samples.NavControllerSample
+import io.ak1.pixsample.samples.PixActivitySample
 import io.ak1.pixsample.samples.ViewPager2Sample
 import io.ak1.pixsample.samples.settings.SettingsActivity
-
 
 /**
  * Created By Akshay Sharma on 18,June,2021
@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity() {
             }
             spanCount = sp.getString("spanCount", "4")?.toInt() ?: 4
             showGallery = sp.getBoolean("showGallery", false)
+            showPreview = sp.getBoolean("showPreview", true)
         }
     }
 
@@ -89,6 +90,10 @@ class MainActivity : AppCompatActivity() {
 
     fun viewPager2SampleClick(view: View) =
         startActivity(Intent(this, ViewPager2Sample::class.java))
+
+    fun pixActivitySampleClick(view: View) {
+        startActivity(Intent(this, PixActivitySample::class.java))
+    }
 
     fun openSettings(view: View) {
         startActivity(Intent(this, SettingsActivity::class.java))

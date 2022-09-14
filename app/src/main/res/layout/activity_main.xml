@@ -74,6 +74,19 @@
         android:text="@string/viewpager2_implementation_sample"
         android:textColor="@color/primary_color_pix" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        style="@style/TextAppearance.MaterialComponents.Body2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:background="@color/white"
+        android:onClick="pixActivitySampleClick"
+        android:gravity="center_vertical"
+        android:minHeight="72dp"
+        android:padding="24dp"
+        android:text="@string/pix_activity_implementation_sample"
+        android:textColor="@color/primary_color_pix" />
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -52,6 +52,11 @@
             app:key="frontFacing"
             app:title="@string/front_facing_title" />
 
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="showPreview"
+            app:title="@string/show_preview" />
+
         <ListPreference
             app:defaultValue="0"
             app:entries="@array/mode_entries"

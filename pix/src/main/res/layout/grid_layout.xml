@@ -27,6 +27,7 @@
                 android:id="@+id/bottom_sheet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_marginStart="-2px"
                 app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
@@ -140,6 +141,7 @@
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/initial_recyclerview_container"
                         android:layout_width="match_parent"
+                        android:visibility="gone"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
